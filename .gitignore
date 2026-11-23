@@ -1,0 +1,17 @@
+bin/
+obj/
+*.exe
+*.dll
+*.SFX
+*.msix
+*.chm
+*.pri
+*.dat
+*.lst
+Descript.ion
+License.txt
+Order.htm
+Rar.txt
+ReadMe.txt
+WhatsNew.txt
+RarExtLogo*.png

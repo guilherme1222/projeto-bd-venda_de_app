@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AppStore Hub</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050816;
+      --surface: #0f1b33;
+      --surface-2: #142644;
+      --surface-3: #1d2e4a;
+      --accent: #6a9cff;
+      --accent-2: #5be3b6;
+      --text: #f1f5ff;
+      --muted: #8aa1c1;
+      --border: rgba(255,255,255,.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top left, rgba(106, 156, 255, 0.12), transparent 22%),
+                  radial-gradient(circle at bottom right, rgba(91, 227, 182, 0.14), transparent 20%),
+                  linear-gradient(180deg, #050816 0%, #081224 100%);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    header {
+      display: grid;
+      gap: 24px;
+      padding: 28px 24px;
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      background: rgba(15, 27, 51, 0.92);
+      box-shadow: 0 22px 70px rgba(0, 0, 0, 0.28);
+    }
+
+    header .topline {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.05;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--muted);
+      max-width: 760px;
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.06);
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+
+    .sections {
+      display: grid;
+      gap: 24px;
+      margin-top: 26px;
+    }
+
+    .page-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 20px 0 0;
+    }
+
+    .page-nav button {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      padding: 12px 18px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: background .2s ease, transform .2s ease;
+    }
+
+    .page-nav button.active {
+      background: linear-gradient(90deg, var(--accent), #2f7df8);
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    .section {
+      display: none;
+      background: rgba(15, 27, 51, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .section-title {
+      margin: 0 0 18px;
+      font-size: 1.3rem;
+      letter-spacing: 0.02em;
+    }
+
+    .section-intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 18px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border-radius: 24px;
+      padding: 22px;
+      border: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .controls input,
+    .controls select,
+    .panel input,
+    .panel select {
+      flex: 1 1 210px;
+      min-width: 180px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 14px;
+      background: rgba(255,255,255,.04);
+      padding: 12px 14px;
+      color: #f8fbff;
+    }
+
+    .list-grid {
+      display: grid;
+      gap: 18px;
+    }
+
+    .app-card,
+    .item-card {
+      background: linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      padding: 20px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .app-card h3,
+    .item-card h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      letter-spacing: 0.01em;
+    }
+
+    .item-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(91, 227, 182, 0.12);
+      border: 1px solid rgba(91, 227, 182, .18);
+      color: #bdf9ea;
+      font-size: 0.85rem;
+    }
+
+    .app-description,
+    .item-description {
+      color: var(--muted);
+      line-height: 1.6;
+      min-height: 70px;
+    }
+
+    .item-actions,
+    .app-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .item-actions button,
+    .app-actions button,
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(90deg, var(--accent), #2f7df8);
+      transition: transform .2s ease, filter .2s ease;
+    }
+
+    .item-actions button.secondary,
+    .btn.secondary {
+      background: rgba(255,255,255,.08);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+
+    .item-actions button:hover,
+    .app-actions button:hover,
+    .btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+    }
+
+    .panel form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .panel label {
+      display: block;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .form-note {
+      margin-top: 14px;
+      color: #b3c4e1;
+      font-size: 0.95rem;
+    }
+
+    .toast {
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: 18px;
+      background: rgba(10, 29, 56, .95);
+      border: 1px solid rgba(255,255,255,.08);
+      color: #c5d7ff;
+    }
+
+    @media (max-width: 960px) {
+      .section-grid,
+      .controls {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <div class="topline">
+        <div>
+          <p class="badge">Loja de Apps | Backend .NET</p>
+          <h1>AppStore Hub — sua loja de aplicativos</h1>
+          <p>Gerencie produtos, cadastre novos apps e navegue por um catálogo estiloso. Essa interface foi feita para parecer mais com uma loja digital, mantendo o CRUD conectado ao seu backend.</p>
+        </div>
+        <div class="hero-badges">
+          <span class="badge">CRUD completo</span>
+          <span class="badge">Swagger pronto</span>
+          <span class="badge">Conexão Oracle</span>
+        </div>
+      </div>
+    </header>
+    <div class="page-nav">
+      <button id="navApps" class="active" type="button">Apps</button>
+      <button id="navPurchases" type="button">Compras</button>
+      <button id="navDevs" type="button">Desenvolvedores</button>
+      <button id="navUsers" type="button">Usuários</button>
+      <button id="navConsult" type="button">Consulta de apps</button>
+    </div>
+
+    <div class="sections">
+      <section class="section active" id="section-apps">
+        <h2 class="section-title">Aplicativos</h2>
+        <p class="section-intro">Veja os apps disponíveis no catálogo, pesquise por nome ou gênero e acesse o básico que importa para o usuário.</p>
+
+        <div class="controls">
+          <input id="searchTerm" type="search" placeholder="Buscar por nome ou gênero" />
+          <select id="filterStatus">
+            <option value="">Todos os status</option>
+            <option value="Ativo">Ativo</option>
+            <option value="Inativo">Inativo</option>
+          </select>
+          <button class="btn" type="button" onclick="carregarAplicativos()">Atualizar apps</button>
+        </div>
+
+        <div class="section-grid">
+          <div class="list-grid" id="listaAplicativos"></div>
+          <div class="panel">
+            <h3>Cadastrar / editar aplicativo</h3>
+            <form id="formAplicativo">
+              <label for="idApp">ID do app</label>
+              <input id="idApp" placeholder="APP01" required />
+              <label for="cpf">CPF do desenvolvedor</label>
+              <input id="cpf" placeholder="11122233344" required />
+              <label for="nomeApp">Nome do aplicativo</label>
+              <input id="nomeApp" placeholder="Space Adventure" required />
+              <label for="dataLancamento">Data de lançamento</label>
+              <input id="dataLancamento" type="date" required />
+              <label for="preco">Preço</label>
+              <input id="preco" type="number" step="0.01" placeholder="4.99" required />
+              <label for="genero">Gênero</label>
+              <input id="genero" placeholder="Jogos" required />
+              <label for="versao">Versão</label>
+              <input id="versao" placeholder="1.0.0" required />
+              <label for="status">Status</label>
+              <input id="status" placeholder="Ativo" required />
+              <button type="submit">Salvar aplicativo</button>
+            </form>
+            <p class="form-note">Selecione um app para editar ou crie novos apps diretamente aqui.</p>
+          </div>
+          <div class="panel" id="purchasePanel" style="display:none;">
+            <h3>Comprar aplicativo</h3>
+            <p class="section-intro" id="purchaseAppName"></p>
+            <form id="formCompra">
+              <label for="compraUsuario">Usuário</label>
+              <select id="compraUsuario"></select>
+              <label for="formaPagamento">Forma de pagamento</label>
+              <select id="formaPagamento">
+                <option value="Cartão">Cartão</option>
+                <option value="PIX">PIX</option>
+                <option value="Boleto">Boleto</option>
+              </select>
+              <label for="compraValor">Valor</label>
+              <input id="compraValor" type="text" readonly />
+              <button type="submit">Confirmar compra</button>
+            </form>
+            <p class="form-note">Escolha o usuário que irá fazer a compra e confirme para registrar o pedido.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="section-consult">
+        <h2 class="section-title">Consulta de apps à venda</h2>
+        <p class="section-intro">Encontre facilmente aplicativos por nome, gênero ou status e veja a lista de ofertas disponíveis.</p>
+
+        <div class="controls">
+          <input id="consultSearch" type="search" placeholder="Buscar app por nome ou gênero" />
+          <select id="consultStatus">
+            <option value="">Todos os status</option>
+            <option value="Ativo">Ativo</option>
+            <option value="Inativo">Inativo</option>
+          </select>
+          <button class="btn" type="button" onclick="renderConsultApps()">Buscar</button>
+        </div>
+
+        <div class="panel">
+          <h3>Resultados de consulta</h3>
+          <div id="consultaResultados"></div>
+        </div>
+      </section>
+      <section class="section" id="section-purchases">
+        <h2 class="section-title">Histórico de compras</h2>
+        <p class="section-intro">Veja as compras realizadas e acompanhe o status dos pedidos.</p>
+
+        <div class="panel">
+          <h3>Compras registradas</h3>
+          <div id="listaCompras"></div>
+        </div>
+      </section>
+      <section class="section" id="section-devs">
+        <h2 class="section-title">Desenvolvedores</h2>
+        <p class="section-intro">Gerencie os desenvolvedores responsáveis pelos aplicativos usando nomes, especialidade e PIX.</p>
+
+        <div class="section-grid">
+          <div class="list-grid" id="listaDesenvolvedores"></div>
+          <div class="panel">
+            <h3>Cadastrar / editar desenvolvedor</h3>
+            <form id="formDesenvolvedor">
+              <label for="cpfDev">CPF</label>
+              <input id="cpfDev" placeholder="11122233344" required />
+              <label for="nomeDev">Nome</label>
+              <input id="nomeDev" placeholder="Ana Souza" required />
+              <label for="especialidade">Especialidade</label>
+              <input id="especialidade" placeholder="Desenvolvimento mobile" required />
+              <label for="pixDev">PIX</label>
+              <input id="pixDev" placeholder="ana@pix" required />
+              <button type="submit">Salvar desenvolvedor</button>
+            </form>
+            <p class="form-note">Use este formulário para manter os dados dos desenvolvedores organizados.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="section-users">
+        <h2 class="section-title">Usuários</h2>
+        <p class="section-intro">Cadastre e gerencie perfis de usuário com login e preferências.</p>
+
+        <div class="section-grid">
+          <div class="list-grid" id="listaUsuarios"></div>
+          <div class="panel">
+            <h3>Cadastrar / editar usuário</h3>
+            <form id="formUsuario">
+              <label for="idUsuario">ID do usuário</label>
+              <input id="idUsuario" placeholder="USU001" required />
+              <label for="loginUsuario">Login</label>
+              <input id="loginUsuario" placeholder="usuario1" required />
+              <label for="preferenciasUsuario">Preferências</label>
+              <input id="preferenciasUsuario" placeholder="Jogos, Produtividade" required />
+              <button type="submit">Salvar usuário</button>
+            </form>
+            <p class="form-note">Usuários ajudam a manter um controle simples dos perfis da loja.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="resultadoAplicativo" class="toast" style="display:none"></div>
+  </div>
+
+  <script>
+    const api = 'http://localhost:5150/api';
+    let apps = [];
+    let desenvolvedores = [];
+    let usuarios = [];
+    let compras = [];
+    let appEditMode = false;
+    let devEditMode = false;
+    let userEditMode = false;
+    let purchaseAppId = null;
+
+    const toast = document.getElementById('resultadoAplicativo');
+    const searchTerm = document.getElementById('searchTerm');
+    const filterStatus = document.getElementById('filterStatus');
+    const consultSearch = document.getElementById('consultSearch');
+    const consultStatus = document.getElementById('consultStatus');
+    const purchasePanel = document.getElementById('purchasePanel');
+    const purchaseAppName = document.getElementById('purchaseAppName');
+    const compraUsuarioSelect = document.getElementById('compraUsuario');
+    const compraValorInput = document.getElementById('compraValor');
+    const sectionButtons = {
+      apps: document.getElementById('navApps'),
+      purchases: document.getElementById('navPurchases'),
+      devs: document.getElementById('navDevs'),
+      users: document.getElementById('navUsers'),
+      consult: document.getElementById('navConsult')
+    };
+
+    function showSection(id) {
+      document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
+      document.querySelectorAll('.page-nav button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      if (id === 'section-apps') sectionButtons.apps.classList.add('active');
+      if (id === 'section-purchases') sectionButtons.purchases.classList.add('active');
+      if (id === 'section-devs') sectionButtons.devs.classList.add('active');
+      if (id === 'section-users') sectionButtons.users.classList.add('active');
+      if (id === 'section-consult') sectionButtons.consult.classList.add('active');
+    }
+
+    sectionButtons.apps.addEventListener('click', () => showSection('section-apps'));
+    sectionButtons.purchases.addEventListener('click', () => showSection('section-purchases'));
+    sectionButtons.devs.addEventListener('click', () => showSection('section-devs'));
+    sectionButtons.users.addEventListener('click', () => showSection('section-users'));
+    sectionButtons.consult.addEventListener('click', () => showSection('section-consult'));
+
+    consultSearch.addEventListener('input', renderConsultApps);
+    consultStatus.addEventListener('change', renderConsultApps);
+
+    document.getElementById('formAplicativo').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        idApp: document.getElementById('idApp').value.trim(),
+        cpf: document.getElementById('cpf').value.trim(),
+        nome: document.getElementById('nomeApp').value.trim(),
+        dataLancamento: document.getElementById('dataLancamento').value,
+        tamanho: 0,
+        downloads: 0,
+        genero: document.getElementById('genero').value.trim(),
+        preco: Number(document.getElementById('preco').value),
+        versao: document.getElementById('versao').value.trim(),
+        status: document.getElementById('status').value.trim()
+      };
+
+      const method = appEditMode ? 'PUT' : 'POST';
+      const res = await fetch(`${api}/aplicativos`, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (res.ok) {
+        showToast(appEditMode ? 'App atualizado com sucesso!' : 'App cadastrado com sucesso!');
+        appEditMode = false;
+        e.target.reset();
+        carregarAplicativos();
+      } else {
+        showToast('Erro ao salvar o app.', true);
+      }
+    });
+
+    document.getElementById('formDesenvolvedor').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        Cpf: document.getElementById('cpfDev').value.trim(),
+        Nome: document.getElementById('nomeDev').value.trim(),
+        Especialidade: document.getElementById('especialidade').value.trim(),
+        Agencia: '',
+        Conta: '',
+        Pix: document.getElementById('pixDev').value.trim()
+      };
+
+      const method = devEditMode ? 'PUT' : 'POST';
+      const res = await fetch(`${api}/desenvolvedores`, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (res.ok) {
+        showToast(devEditMode ? 'Desenvolvedor atualizado!' : 'Desenvolvedor cadastrado!');
+        devEditMode = false;
+        e.target.reset();
+        carregarDesenvolvedores();
+      } else {
+        showToast('Erro ao salvar o desenvolvedor.', true);
+      }
+    });
+
+    document.getElementById('formUsuario').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        IdUsuario: document.getElementById('idUsuario').value.trim(),
+        Login: document.getElementById('loginUsuario').value.trim(),
+        Preferencias: document.getElementById('preferenciasUsuario').value.trim()
+      };
+
+      const method = userEditMode ? 'PUT' : 'POST';
+      const res = await fetch(`${api}/usuarios`, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (res.ok) {
+        showToast(userEditMode ? 'Usuário atualizado!' : 'Usuário cadastrado!');
+        userEditMode = false;
+        e.target.reset();
+        carregarUsuarios();
+      } else {
+        showToast('Erro ao salvar o usuário.', true);
+      }
+    });
+
+    document.getElementById('formCompra').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!purchaseAppId) {
+        showToast('Selecione um aplicativo para comprar antes de continuar.', true);
+        return;
+      }
+
+      const payload = {
+        IdCompra: `COMP_${Date.now()}`,
+        IdUsuario: compraUsuarioSelect.value,
+        IdApp: purchaseAppId,
+        DataCompra: new Date().toISOString(),
+        PrecoPago: Number(compraValorInput.value.replace(',', '.')),
+        FormaPagamento: document.getElementById('formaPagamento').value
+      };
+
+      const res = await fetch(`${api}/compras`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      if (res.ok) {
+        showToast('Compra registrada com sucesso!');
+        purchaseAppId = null;
+        purchasePanel.style.display = 'none';
+        document.getElementById('formCompra').reset();
+        carregarCompras();
+      } else {
+        showToast('Falha ao registrar a compra.', true);
+      }
+    });
+
+    searchTerm.addEventListener('input', exibirApps);
+    filterStatus.addEventListener('change', exibirApps);
+
+    function showToast(message, isError = false) {
+      toast.style.display = 'block';
+      toast.textContent = message;
+      toast.style.borderColor = isError ? 'rgba(255, 80, 80, 0.35)' : 'rgba(91, 227, 182, .18)';
+      toast.style.background = isError ? 'rgba(112, 35, 35, .9)' : 'rgba(10, 29, 56, .95)';
+      setTimeout(() => toast.style.display = 'none', 4200);
+    }
+
+    async function carregarAplicativos() {
+      const res = await fetch(`${api}/aplicativos`);
+      if (!res.ok) {
+        showToast('Não foi possível carregar os aplicativos.', true);
+        return;
+      }
+      apps = await res.json();
+      exibirApps();
+      renderConsultApps();
+    }
+
+    async function carregarDesenvolvedores() {
+      const res = await fetch(`${api}/desenvolvedores`);
+      if (!res.ok) {
+        showToast('Não foi possível carregar os desenvolvedores.', true);
+        return;
+      }
+      desenvolvedores = await res.json();
+      exibirDesenvolvedores();
+    }
+
+    async function carregarUsuarios() {
+      const res = await fetch(`${api}/usuarios`);
+      if (!res.ok) {
+        showToast('Não foi possível carregar os usuários.', true);
+        return;
+      }
+      usuarios = await res.json();
+      exibirUsuarios();
+      preencherUsuariosParaCompra();
+    }
+
+    function preencherUsuariosParaCompra() {
+      compraUsuarioSelect.innerHTML = usuarios.map(user => `<option value="${user.idUsuario}">${user.login} (${user.idUsuario})</option>`).join('');
+      if (usuarios.length === 0) {
+        compraUsuarioSelect.innerHTML = '<option value="">Nenhum usuário disponível</option>';
+      }
+    }
+
+    async function carregarCompras() {
+      const res = await fetch(`${api}/compras`);
+      if (!res.ok) {
+        showToast('Não foi possível carregar o histórico de compras.', true);
+        return;
+      }
+      compras = await res.json();
+      exibirCompras();
+    }
+
+    function exibirCompras() {
+      if (!compras.length) {
+        document.getElementById('listaCompras').innerHTML = '<p style="color: var(--muted);">Nenhuma compra registrada ainda.</p>';
+        return;
+      }
+
+      document.getElementById('listaCompras').innerHTML = compras.map(compra => `
+        <article class="item-card">
+          <div class="item-row"><span>Compra ${compra.idCompra}</span><span>${new Date(compra.dataCompra).toLocaleDateString('pt-BR')}</span></div>
+          <h3>App ${compra.idApp}</h3>
+          <p class="item-description">Usuário: ${compra.idUsuario} · Pago R$ ${Number(compra.precoPago).toFixed(2)} · ${compra.formaPagamento}</p>
+        </article>
+      `).join('');
+    }
+
+    function exibirApps() {
+      const term = searchTerm.value.toLowerCase();
+      const status = filterStatus.value;
+      const cards = apps.filter(app => {
+        const matchesText = [app.nome, app.genero, app.status, app.idApp].some(value => String(value).toLowerCase().includes(term));
+        const matchesStatus = !status || app.status === status;
+        return matchesText && matchesStatus;
+      }).map(app => createAppCard(app)).join('');
+
+      document.getElementById('listaAplicativos').innerHTML = cards || '<p style="color: var(--muted);">Nenhum aplicativo encontrado. Use a busca ou atualize o catálogo.</p>';
+    }
+
+    function exibirDesenvolvedores() {
+      const cards = desenvolvedores.map(dev => createDeveloperCard(dev)).join('');
+      document.getElementById('listaDesenvolvedores').innerHTML = cards || '<p style="color: var(--muted);">Nenhum desenvolvedor cadastrado ainda.</p>';
+    }
+
+    function exibirUsuarios() {
+      const cards = usuarios.map(user => createUserCard(user)).join('');
+      document.getElementById('listaUsuarios').innerHTML = cards || '<p style="color: var(--muted);">Nenhum usuário cadastrado ainda.</p>';
+    }
+
+    function renderConsultApps() {
+      const term = consultSearch.value.toLowerCase();
+      const status = consultStatus.value;
+      const cards = apps.filter(app => {
+        const matchesText = [app.nome, app.genero, app.status, app.idApp].some(value => String(value).toLowerCase().includes(term));
+        const matchesStatus = !status || app.status === status;
+        return matchesText && matchesStatus;
+      }).map(app => `
+        <article class="app-card">
+          <div class="item-row"><span class="pill">${app.genero}</span><span>${app.dataLancamento?.slice(0,10) || 'Sem data'}</span></div>
+          <h3>${app.nome}</h3>
+          <p class="app-description">Preço R$ ${Number(app.preco).toFixed(2)} · ${app.status}</p>
+          <div class="item-row"><span>Desenvolvedor: ${app.cpf}</span><span>${app.downloads || 0} downloads</span></div>
+        </article>
+      `).join('');
+
+      document.getElementById('consultaResultados').innerHTML = cards || '<p style="color: var(--muted);">Nenhum app encontrado para essa consulta.</p>';
+    }
+
+    function createAppCard(app) {
+      return `
+        <article class="app-card">
+          <div class="item-row"><span class="pill">${app.genero}</span><span>${app.dataLancamento?.slice(0,10) || 'Sem data'}</span></div>
+          <h3>${app.nome}</h3>
+          <p class="app-description">Versão ${app.versao} · ${app.downloads || 0} downloads · ${app.status}</p>
+          <div class="item-row"><span>R$ ${Number(app.preco).toFixed(2)}</span><span>Desenvolvedor: ${app.cpf}</span></div>
+          <div class="app-actions">
+            <button onclick="selecionarAppParaCompra('${app.idApp}')">Comprar</button>
+            <button onclick="editarApp('${app.idApp}')">Editar</button>
+            <button class="secondary" onclick="deletarApp('${app.idApp}')">Excluir</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function createDeveloperCard(dev) {
+      return `
+        <article class="item-card">
+          <div class="item-row"><span>${dev.nome}</span><span>${dev.cpf}</span></div>
+          <h3>${dev.especialidade}</h3>
+          <p class="item-description">PIX: ${dev.pix || 'não informado'}</p>
+          <div class="item-actions">
+            <button onclick="editarDesenvolvedor('${dev.cpf}')">Editar</button>
+            <button class="secondary" onclick="deletarDesenvolvedor('${dev.cpf}')">Excluir</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function createUserCard(user) {
+      return `
+        <article class="item-card">
+          <div class="item-row"><span>${user.login}</span><span>${user.idUsuario}</span></div>
+          <h3>Preferências</h3>
+          <p class="item-description">${user.preferencias || 'Não informado'}</p>
+          <div class="item-actions">
+            <button onclick="editarUsuario('${user.idUsuario}')">Editar</button>
+            <button class="secondary" onclick="deletarUsuario('${user.idUsuario}')">Excluir</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function editarApp(idApp) {
+      const app = apps.find(item => item.idApp === idApp);
+      if (!app) return;
+      document.getElementById('idApp').value = app.idApp;
+      document.getElementById('cpf').value = app.cpf;
+      document.getElementById('nomeApp').value = app.nome;
+      document.getElementById('dataLancamento').value = app.dataLancamento?.slice(0, 10) || '';
+      document.getElementById('preco').value = app.preco;
+      document.getElementById('genero').value = app.genero;
+      document.getElementById('versao').value = app.versao;
+      document.getElementById('status').value = app.status;
+      appEditMode = true;
+      showToast('Modo de edição de app ativado. Atualize e salve.');
+    }
+
+    function selecionarAppParaCompra(idApp) {
+      const app = apps.find(item => item.idApp === idApp);
+      if (!app) return;
+      purchaseAppId = app.idApp;
+      purchaseAppName.textContent = `Comprar ${app.nome} por R$ ${Number(app.preco).toFixed(2)}`;
+      compraValorInput.value = Number(app.preco).toFixed(2);
+      purchasePanel.style.display = 'block';
+      showSection('section-apps');
+      showToast(`Compra pronta para ${app.nome}. Escolha o usuário e confirme.`);
+    }
+
+    function editarDesenvolvedor(cpf) {
+      const dev = desenvolvedores.find(item => item.cpf === cpf);
+      if (!dev) return;
+      document.getElementById('cpfDev').value = dev.cpf;
+      document.getElementById('nomeDev').value = dev.nome;
+      document.getElementById('especialidade').value = dev.especialidade;
+      document.getElementById('pixDev').value = dev.pix;
+      devEditMode = true;
+      showToast('Modo de edição de desenvolvedor ativado. Atualize e salve.');
+    }
+
+    function editarUsuario(idUsuario) {
+      const user = usuarios.find(item => item.idUsuario === idUsuario);
+      if (!user) return;
+      document.getElementById('idUsuario').value = user.idUsuario;
+      document.getElementById('loginUsuario').value = user.login;
+      document.getElementById('preferenciasUsuario').value = user.preferencias;
+      userEditMode = true;
+      showToast('Modo de edição de usuário ativado. Atualize e salve.');
+    }
+
+    async function deletarApp(idApp) {
+      if (!confirm('Remover este app do catálogo?')) return;
+      const res = await fetch(`${api}/aplicativos/${idApp}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('App removido com sucesso.');
+        carregarAplicativos();
+      } else {
+        showToast('Falha ao excluir o app.', true);
+      }
+    }
+
+    async function deletarDesenvolvedor(cpf) {
+      if (!confirm('Remover este desenvolvedor?')) return;
+      const res = await fetch(`${api}/desenvolvedores/${cpf}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('Desenvolvedor removido com sucesso.');
+        carregarDesenvolvedores();
+      } else {
+        showToast('Falha ao excluir o desenvolvedor.', true);
+      }
+    }
+
+    async function deletarUsuario(idUsuario) {
+      if (!confirm('Remover este usuário?')) return;
+      const res = await fetch(`${api}/usuarios/${idUsuario}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('Usuário removido com sucesso.');
+        carregarUsuarios();
+      } else {
+        showToast('Falha ao excluir o usuário.', true);
+      }
+    }
+
+    carregarAplicativos();
+    carregarDesenvolvedores();
+    carregarUsuarios();
+    carregarCompras();
+  </script>
+</body>
+</html>
